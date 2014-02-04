@@ -23,6 +23,7 @@ import android.widget.Toast;
 public class MainActivity extends ActionBarActivity {
 
     private WifiManager wifiManager;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,8 +38,11 @@ public class MainActivity extends ActionBarActivity {
         setUpWifi();
     }
 
+    /**
+     * Sets up the wifi manager and registers for receiving broadcast
+     */
     private void setUpWifi() {
-        wifiManager = (WifiManager)this.getSystemService(Context.WIFI_SERVICE);
+        wifiManager = (WifiManager) this.getSystemService(Context.WIFI_SERVICE);
         IntentFilter intentFilter = new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION);
         this.registerReceiver(new BroadcastReceiver() {
             @Override
@@ -47,8 +51,14 @@ public class MainActivity extends ActionBarActivity {
             }
         }, intentFilter);
     }
+
+    /**
+     * Handler for button click event
+     *
+     * @param view: The scan button
+     */
     public void startScan(View view) {
-        if(!wifiManager.isWifiEnabled()) {
+        if (!wifiManager.isWifiEnabled()) {
             Toast.makeText(this, "Enabling Wifi", Toast.LENGTH_LONG);
             wifiManager.setWifiEnabled(true);
         }
@@ -56,25 +66,32 @@ public class MainActivity extends ActionBarActivity {
         wifiManager.startScan();
     }
 
+    /**
+     * Gets Wifi scanning result.
+     * <p/>
+     * This method gets called after scanning has finished.
+     */
     private void handleWifiScanResult() {
         // Get location label
+        String location = ((EditText) findViewById(R.id.edit_label)).getText().toString();
 
-        String location = ((EditText)findViewById(R.id.edit_label)).getText().toString();
+        // Iterates over the access points
         StringBuffer sb = new StringBuffer();
-        for(ScanResult e: wifiManager.getScanResults()) {
+        for (ScanResult e : wifiManager.getScanResults()) {
             sb.append(e.BSSID);
             sb.append(": ");
             sb.append(e.SSID);
             sb.append("\n");
         }
 
+        // Now, populate the text view.
         TextView textView = (TextView) findViewById(R.id.text_scan_result);
         textView.setText(sb.toString());
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        
+
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
         return true;
@@ -102,7 +119,7 @@ public class MainActivity extends ActionBarActivity {
 
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                Bundle savedInstanceState) {
+                                 Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_main, container, false);
             return rootView;
         }
